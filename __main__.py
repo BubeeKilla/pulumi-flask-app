@@ -124,12 +124,13 @@ image = Image("flask-ipsum-image",
         "context": "./",
         "dockerfile": "Dockerfile",
         "args": {
-            "BUILD_DATE": str(time.time()),  # force rebuild
+            "BUILD_DATE": str(time.time()),
         }
     },
-    image_name=repo.repository_url,
+    image_name=f"{repo.repository_url}:latest",
     registry=registry
 )
+
 
 # 13. Task Execution Role
 task_exec_role = iam.Role("task-exec-role",
@@ -159,11 +160,11 @@ task_definition = ecs.TaskDefinition("flask-task",
     network_mode="awsvpc",
     requires_compatibilities=["FARGATE"],
     execution_role_arn=task_exec_role.arn,
-    container_definitions=image.image_name.apply(lambda name: f"""
+    container_definitions = image.image_name.apply(lambda name: f"""
     [
         {{
             "name": "flask-app",
-            "image": "{name}",
+            "image": "{name}:latest",
             "portMappings": [{{"containerPort": 5000, "protocol": "tcp"}}],
             "environment": [
                 {{
@@ -200,6 +201,11 @@ service = ecs.Service("flask-service",
         "container_name": "flask-app",
         "container_port": 5000,
     }],
+    deployment_controller={
+        "type": "ECS"
+    },
+    deployment_min_healthy_percent=0,
+    deployment_max_percent=100,
     opts=pulumi.ResourceOptions(depends_on=[listener])
 )
 
