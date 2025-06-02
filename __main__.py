@@ -4,6 +4,7 @@ from pulumi_aws import ecs, ec2, iam, lb, ecr
 from pulumi_docker import Image
 import base64
 import time
+import random
 
 # 1. Get 2 Availability Zones
 azs = aws.get_availability_zones(state="available").names[:2]
@@ -148,8 +149,11 @@ iam.RolePolicyAttachment("task-exec-policy-attach",
 )
 
 # 14. ECS Task Definition with env var for AZ
+# Add a random suffix to family to force new task definition revision on each deploy
+random_suffix = str(random.randint(10000, 99999))
+
 task_definition = ecs.TaskDefinition("flask-task",
-    family="flask-task",
+    family=f"flask-task-{random_suffix}",
     cpu="256",
     memory="512",
     network_mode="awsvpc",
