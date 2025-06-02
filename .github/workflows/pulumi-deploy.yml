@@ -37,9 +37,12 @@ jobs:
           aws-region: eu-central-1
 
       - name: Login to Pulumi
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         run: |
           export PATH=$HOME/.pulumi/bin:$PATH
           pulumi login
+
 
       - name: Select or create Pulumi stack
         run: |
