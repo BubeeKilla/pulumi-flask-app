@@ -5,6 +5,33 @@ from pulumi_docker import Image
 import base64
 import time
 import random
+import json
+
+
+def get_container_def(name: str):
+    return json.dumps([
+        {
+            "name": "flask-app",
+            "image": f"{name}:latest",
+            "portMappings": [
+                {"containerPort": 5000, "protocol": "tcp"}
+            ],
+            "environment": [
+                {
+                    "name": "TASK_AZ",
+                    "value": azs[0]
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/flask-task",
+                    "awslogs-region": "eu-central-1",
+                    "awslogs-stream-prefix": "flask"
+                }
+            }
+        }
+    ])
 
 # 1. Get 2 Availability Zones
 azs = aws.get_availability_zones(state="available").names[:2]
@@ -160,29 +187,7 @@ task_definition = ecs.TaskDefinition("flask-task",
     network_mode="awsvpc",
     requires_compatibilities=["FARGATE"],
     execution_role_arn=task_exec_role.arn,
-    container_definitions = image.image_name.apply(lambda name: f"""
-    [
-        {{
-            "name": "flask-app",
-            "image": "{name}:latest",
-            "portMappings": [{{"containerPort": 5000, "protocol": "tcp"}}],
-            "environment": [
-                {{
-                    "name": "TASK_AZ",
-                    "value": "{azs[0]}"
-                }}
-            ],
-            "logConfiguration": {{
-                "logDriver": "awslogs",
-                "options": {{
-                    "awslogs-group": "/ecs/flask-task",
-                    "awslogs-region": "eu-central-1",
-                    "awslogs-stream-prefix": "flask"
-                }}
-            }}
-        }}
-    ]
-""")
+    container_definitions=image.image_name.apply(get_container_def)
 )
 
 # 15. ECS Service
