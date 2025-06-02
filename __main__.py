@@ -139,11 +139,13 @@ auth_token = aws.ecr.get_authorization_token(registry_id=repo.registry_id)
 decoded = base64.b64decode(auth_token.authorization_token).decode()
 password = decoded.split(":")[1]
 
-registry = {
-    "server": repo.repository_url,
-    "username": auth_token.user_name,
-    "password": password,
-}
+registry = pulumi.Output.all(repo.repository_url, auth_token.user_name).apply(
+    lambda args: {
+        "server": args[0].lower(),
+        "username": args[1],
+        "password": password,
+    }
+)
 
 # 12. Build and push Docker image
 image = Image("flask-ipsum-image",
@@ -154,7 +156,7 @@ image = Image("flask-ipsum-image",
             "BUILD_DATE": str(time.time()),
         }
     },
-    image_name=f"{repo.repository_url}:latest",
+    image_name=repo.repository_url.apply(lambda url: url.lower() + ":latest"),
     registry=registry
 )
 
