@@ -209,8 +209,6 @@ service = ecs.Service("flask-service",
     deployment_controller={
         "type": "ECS"
     },
-    deployment_min_healthy_percent=0,
-    deployment_max_percent=100,
     opts=pulumi.ResourceOptions(depends_on=[listener])
 )
 
