@@ -4,6 +4,7 @@ from pulumi_aws import ec2, ecs, iam, ecr, cloudwatch
 from pulumi_docker import Image
 import base64
 import json
+import os
 
 # 1. VPC
 vpc = ec2.Vpc("vpc", cidr_block="10.0.0.0/16")
@@ -33,6 +34,7 @@ sg = ec2.SecurityGroup("flask-sg", vpc_id=vpc.id,
 cluster = ecs.Cluster("cluster")
 
 # 6. ECR + Docker Image
+image_tag = os.getenv("IMAGE_TAG", "latest")
 repo = ecr.Repository("repo")
 auth = aws.ecr.get_authorization_token()
 decoded = base64.b64decode(auth.authorization_token).decode()
@@ -44,7 +46,7 @@ registry = {
 }
 image = Image("flask-image",
     build={"context": "./"},
-    image_name=repo.repository_url.apply(lambda url: f"{url}:latest"),
+    image_name=repo.repository_url.apply(lambda url: f"{url}:{image_tag}"),
     registry=registry
 )
 

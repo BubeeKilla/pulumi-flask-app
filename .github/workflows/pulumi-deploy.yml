@@ -13,6 +13,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Set IMAGE_TAG env
+        run: echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -43,15 +46,12 @@ jobs:
           export PATH=$HOME/.pulumi/bin:$PATH
           pulumi login
 
-
       - name: Select or create Pulumi stack
-        run: |
-          pulumi stack select dev
+        run: pulumi stack select dev
 
       - name: Pulumi up
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         run: |
           export PATH=$HOME/.pulumi/bin:$PATH
-          pulumi stack select dev
           pulumi up --yes
