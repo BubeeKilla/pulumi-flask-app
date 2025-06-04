@@ -11,14 +11,18 @@ This project demonstrates how to deploy a containerized Flask application on AWS
 - **GitHub Actions** – CI/CD pipeline for automated deployment
 
 ## 📁 Project Structure
+
+```text
 .
-├── app.py # Flask application/n
-├── Dockerfile # Docker image for Flask app
-├── requirements.txt # Python dependencies
-├── main.py # Pulumi infrastructure code
-├── Pulumi.yaml # Pulumi project config
-├── .github/workflows # GitHub Actions workflow
-└── templates/index.html # HTML template
+├── app.py               # Flask application
+├── Dockerfile           # Docker image for Flask app
+├── requirements.txt     # Python dependencies
+├── __main__.py          # Pulumi infrastructure code
+├── Pulumi.yaml          # Pulumi project config
+├── .github/workflows    # GitHub Actions workflow
+└── templates/
+    └── index.html       # HTML template
+```
 
 ## 🚀 Deployment
 
