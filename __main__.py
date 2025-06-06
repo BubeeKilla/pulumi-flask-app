@@ -113,13 +113,17 @@ service = ecs.Service("service",
 # Export the public IP of the first task's network interface
 def get_public_ip(sg_id: str):
     """Return the public IP for the first ENI attached to the security group."""
-    interfaces = aws.ec2.get_network_interfaces(
+    interfaces = aws.ec2.get_network_interfaces_output(
         filters=[{"name": "group-id", "values": [sg_id]}]
     )
-    if not interfaces.ids:
-        return None
-    eni = aws.ec2.get_network_interface(id=interfaces.ids[0])
-    return eni.association.public_ip if eni.association else None
+
+    def resolve_ip(ids):
+        if not ids:
+            return None
+        eni = aws.ec2.get_network_interface_output(id=ids[0])
+        return eni.association.apply(lambda assoc: assoc.public_ip if assoc else None)
+
+    return interfaces.ids.apply(resolve_ip)
 
 public_ip = sg.id.apply(get_public_ip)
 pulumi.export("public_ip", public_ip)
