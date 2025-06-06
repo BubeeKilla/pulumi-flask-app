@@ -121,7 +121,7 @@ def get_public_ip(sg_id: str):
         if not ids:
             return None
         eni = aws.ec2.get_network_interface_output(id=ids[0])
-        return eni.association.apply(lambda assoc: assoc.public_ip if assoc else None)
+        return eni.apply(lambda i: i.association.public_ip if i.association else None)
 
     return interfaces.ids.apply(resolve_ip)
 
