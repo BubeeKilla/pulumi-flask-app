@@ -53,7 +53,7 @@ The pipeline does:
 - Deploy using pulumi up
 - Trigger: On push to main branch.
 
------------------------------------------------------------------------
+---
 
 🔐 Secrets (GitHub Actions)
 
