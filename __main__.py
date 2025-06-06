@@ -119,9 +119,13 @@ def get_public_ip(sg_id: str):
         if not ids:
             return None
         eni = aws.ec2.get_network_interface_output(id=ids[0])
-        return eni.association.apply(
-            lambda assoc: assoc.public_ip if assoc else None
-        )
+
+        # Try to get the public IP safely:
+        # First, check if 'association' exists on eni, else None
+        def get_public_ip_safe(eni_obj):
+            return eni_obj.association.public_ip if hasattr(eni_obj, "association") and eni_obj.association else None
+
+        return get_public_ip_safe(eni)
 
     return interfaces.ids.apply(resolve_ip)
 
