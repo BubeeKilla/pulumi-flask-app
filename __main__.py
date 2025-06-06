@@ -109,27 +109,5 @@ service = ecs.Service("service",
     }
 )
 
-# Export the public IP of the first task's network interface
-def get_public_ip(sg_id: str):
-    interfaces = aws.ec2.get_network_interfaces_output(
-        filters=[{"name": "group-id", "values": [sg_id]}]
-    )
-
-    def resolve_ip(ids):
-        if not ids:
-            return None
-        eni = aws.ec2.get_network_interface_output(id=ids[0])
-
-        # Try to get the public IP safely:
-        # First, check if 'association' exists on eni, else None
-        def get_public_ip_safe(eni_obj):
-            return eni_obj.association.public_ip if hasattr(eni_obj, "association") and eni_obj.association else None
-
-        return get_public_ip_safe(eni)
-
-    return interfaces.ids.apply(resolve_ip)
-
-public_ip = sg.id.apply(get_public_ip)
-pulumi.export("public_ip", public_ip)
-
+# Export the ECR repo URL (remove public_ip export for now)
 pulumi.export("ecr_repo_url", repo.repository_url)
