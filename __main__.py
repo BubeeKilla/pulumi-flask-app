@@ -6,6 +6,8 @@ import base64
 import json
 import os
 
+region = aws.get_region().name
+
 # 1. VPC
 vpc = ec2.Vpc("vpc", cidr_block="10.0.0.0/16")
 
@@ -79,7 +81,7 @@ container_def = pulumi.Output.all(image.image_name, log_group.name, subnet.avail
             "logDriver": "awslogs",
             "options": {
                 "awslogs-group": args[1],
-                "awslogs-region": "eu-central-1",
+                "awslogs-region": region,
                 "awslogs-stream-prefix": "flask"
             }
         }
@@ -109,5 +111,5 @@ service = ecs.Service("service",
     }
 )
 
-# Export the ECR repo URL (remove public_ip export for now)
-pulumi.export("ecr_repo_url", repo.repository_url)
+# Export the ECR repo URL
+#pulumi.export("ecr_repo_url", repo.repository_url)
