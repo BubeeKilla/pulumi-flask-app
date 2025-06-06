@@ -104,10 +104,19 @@ service = ecs.Service("service",
     launch_type="FARGATE",
     task_definition=task_def.arn,
     network_configuration={
-        "assign_public_ip": True,
+        "assignPublicIp": True,
         "subnets": [subnet.id],
         "security_groups": [sg.id],
     }
 )
+
+# Export the public IP of the first task's network interface
+eni_id = sg.id.apply(
+    lambda sg_id: aws.ec2.get_network_interfaces(
+        filters=[{"name": "group-id", "values": [sg_id]}]
+    ).ids[0]
+)
+public_ip = eni_id.apply(lambda id: aws.ec2.get_network_interface(id=id).association.public_ip)
+pulumi.export("public_ip", public_ip)
 
 pulumi.export("ecr_repo_url", repo.repository_url)

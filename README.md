@@ -61,6 +61,10 @@ Set these in your repo under Settings > Secrets and variables > Actions:
 
 🌐 Access
 
-Once deployed, your Flask app will be accessible via:
-- http://<public-ip>:5000
-The public IP is exported by Pulumi after deployment.
+Once deployed, your Flask app will be accessible via the public IP exported by Pulumi:
+
+```bash
+pulumi stack output public_ip
+```
+
+Visit `http://<public-ip>:5000` using the output value.
