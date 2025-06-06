@@ -120,8 +120,9 @@ def get_public_ip(sg_id: str):
     def resolve_ip(ids):
         if not ids:
             return None
-        eni = aws.ec2.get_network_interface_output(id=ids[0])
-        return eni.apply(lambda i: i.association.public_ip if i.association else None)
+        # Using the blocking version of the data source avoids missing attributes
+        eni = aws.ec2.get_network_interface(id=ids[0])
+        return eni.association.public_ip if eni.association else None
 
     return interfaces.ids.apply(resolve_ip)
 
