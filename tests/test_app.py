@@ -2,12 +2,10 @@ import os
 import sys
 import pytest
 
+# Make sure the app module can be imported from the root
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-try:
-    import app
-except ModuleNotFoundError as e:
-    pytest.skip(f"flask not available: {e}", allow_module_level=True)
+import app  # assume it's there, because it is!
 
 def test_index_route():
     os.environ["TASK_AZ"] = "test-az"

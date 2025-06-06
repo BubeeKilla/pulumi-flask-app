@@ -86,7 +86,6 @@ container_def = pulumi.Output.all(image.image_name, log_group.name, subnet.avail
     }])
 )
 
-
 task_def = ecs.TaskDefinition("task",
     family="flask-task",
     cpu="256",
@@ -120,7 +119,8 @@ def get_public_ip(sg_id: str):
         if not ids:
             return None
         eni = aws.ec2.get_network_interface_output(id=ids[0])
-        return eni.private_ip_addresses[0].association.apply(
+        # Access 'private_ip' directly, then get association safely
+        return eni.association.apply(
             lambda assoc: assoc.public_ip if assoc else None
         )
 
