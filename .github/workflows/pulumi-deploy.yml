@@ -55,3 +55,13 @@ jobs:
         run: |
           export PATH=$HOME/.pulumi/bin:$PATH
           pulumi up --yes
+
+      - name: Get ECS Task Public IP
+        env:
+          CLUSTER_NAME: cluster-12ecb51
+          SERVICE_NAME: service-f4c1b6c
+        run: |
+          TASK_ARN=$(aws ecs list-tasks --cluster $CLUSTER_NAME --service-name $SERVICE_NAME --desired-status RUNNING --query 'taskArns[0]' --output text)
+          ENI_ID=$(aws ecs describe-tasks --cluster $CLUSTER_NAME --tasks $TASK_ARN --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' --output text)
+          PUBLIC_IP=$(aws ec2 describe-network-interfaces --network-interface-ids $ENI_ID --query 'NetworkInterfaces[0].Association.PublicIp' --output text)
+          echo "ECS Task Public IP: $PUBLIC_IP"    
