@@ -69,6 +69,6 @@ Once deployed, your Flask app will be accessible via the public IP exported by P
 ```bash
 pulumi stack output public_ip
 ```
-The value may be empty until the ECS task is running and a network interface has been created.
+This value may be empty until the ECS task is running and its network interface has been created.
 
 Visit `http://<public-ip>:5000` using the output value.
