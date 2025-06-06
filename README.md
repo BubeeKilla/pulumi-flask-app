@@ -16,6 +16,7 @@ This project demonstrates how to deploy a containerized Flask application on AWS
 .
 ├── app.py               # Flask application
 ├── Dockerfile           # Docker image for Flask app
+├── .dockerignore        # Files excluded from the build context
 ├── requirements.txt     # Python dependencies
 ├── __main__.py          # Pulumi infrastructure code
 ├── Pulumi.yaml          # Pulumi project config
