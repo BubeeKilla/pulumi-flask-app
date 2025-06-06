@@ -111,12 +111,15 @@ service = ecs.Service("service",
 )
 
 # Export the public IP of the first task's network interface
-eni_id = sg.id.apply(
-    lambda sg_id: aws.ec2.get_network_interfaces(
+def get_public_ip(sg_id: str):
+    interfaces = aws.ec2.get_network_interfaces(
         filters=[{"name": "group-id", "values": [sg_id]}]
-    ).ids[0]
-)
-public_ip = eni_id.apply(lambda id: aws.ec2.get_network_interface(id=id).association.public_ip)
+    )
+    if not interfaces.ids:
+        return None
+    return aws.ec2.get_network_interface(id=interfaces.ids[0]).association.public_ip
+
+public_ip = sg.id.apply(get_public_ip)
 pulumi.export("public_ip", public_ip)
 
 pulumi.export("ecr_repo_url", repo.repository_url)
