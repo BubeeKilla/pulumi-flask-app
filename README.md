@@ -19,7 +19,10 @@ This project demonstrates how to deploy a containerized Flask application on AWS
 ├── requirements.txt     # Python dependencies
 ├── __main__.py          # Pulumi infrastructure code
 ├── Pulumi.yaml          # Pulumi project config
+├── Pulumi.dev.yaml      # Pulumi stack config for local development
 ├── .github/workflows    # GitHub Actions workflow
+├── tests/
+│   └── test_app.py      # Unit tests
 └── templates/
     └── index.html       # HTML template
 ```
