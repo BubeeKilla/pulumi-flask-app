@@ -63,11 +63,41 @@ Set these in your repo under Settings > Secrets and variables > Actions:
 
 🌐 Access
 
-Once deployed, your Flask app will be accessible via the public IP exported by Pulumi:
+Once deployed, your Flask app will be accessible via the public IP and the port 5000.
+First you need to find out your cluster name:
 
 ```bash
-pulumi stack output public_ip
+aws ecs list-clusters
 ```
-This value may be empty until the ECS task is running and its network interface has been created.
 
-Visit `http://<public-ip>:5000` using the output value.
+Use the output here:
+
+```bash
+CLUSTER_NAME="insert here the output"
+```
+Second you need to find out your cluster service name:
+
+```bash
+aws ecs list-services --cluster $CLUSTER_NAME
+```
+
+Use the output here:
+
+```bash
+SERVICE_NAME="insert here the output"
+```
+
+Now we will use these two variables in the code below to get the output of our public IP:
+
+```bash
+TASK_ARN=$(aws ecs list-tasks --cluster $CLUSTER_NAME --service-name $SERVICE_NAME --desired-status RUNNING --query "taskArns[0]" --output text)
+
+ENI_ID=$(aws ecs describe-tasks --cluster $CLUSTER_NAME --tasks $TASK_ARN --query "tasks[0].attachments[0].details[?name==\'networkInterfaceId\'].value" --output text)
+
+PUBLIC_IP=$(aws ec2 describe-network-interfaces --network-interface-ids $ENI_ID --query "NetworkInterfaces[0].Association.PublicIp" --output text)
+
+echo "ECS Task Public IP: $PUBLIC_IP:5000
+```
+
+You will get output >> `<your-public-ip>:5000`.
+Copy/Paste it in browser to visit your Flask index page.
