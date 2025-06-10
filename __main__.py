@@ -1,6 +1,6 @@
 import pulumi
 import pulumi_aws as aws
-from pulumi_aws import ec2, ecs, iam, ecr, cloudwatch
+from pulumi_aws import ec2, ecs, iam, ecr, cloudwatch, amp
 from pulumi_docker import Image
 import base64
 import json
@@ -55,7 +55,7 @@ image = Image("flask-image",
 # 7. CloudWatch Log Group
 log_group = cloudwatch.LogGroup("log-group", retention_in_days=1)
 
-# 8. Task Execution Role
+# 8. IAM Role for ECS
 role = iam.Role("task-exec-role", assume_role_policy="""{
     "Version": "2008-10-17",
     "Statement": [{
@@ -68,7 +68,7 @@ iam.RolePolicyAttachment("policy-attach", role=role.name,
     policy_arn="arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 )
 
-# 9. Task Definition
+# 9. ECS Task Definition
 container_def = pulumi.Output.all(image.image_name, log_group.name, subnet.availability_zone).apply(
     lambda args: json.dumps([{
         "name": "flask",
@@ -98,7 +98,7 @@ task_def = ecs.TaskDefinition("task",
     container_definitions=container_def
 )
 
-# 10. ECS Service with Public IP
+# 10. ECS Service
 service = ecs.Service("service",
     cluster=cluster.arn,
     desired_count=1,
@@ -111,5 +111,26 @@ service = ecs.Service("service",
     }
 )
 
+# 11. AMP Workspace
+workspace = amp.Workspace("prometheus-workspace",
+    alias="flask-monitoring"
+)
+
+# IAM Role for AMP (future use)
+scrape_role = iam.Role("amp-scrape-role", assume_role_policy=json.dumps({
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Effect": "Allow",
+        "Principal": {"Service": "aps.amazonaws.com"},
+        "Action": "sts:AssumeRole"
+    }]
+}))
+iam.RolePolicyAttachment("amp-scrape-policy",
+    role=scrape_role.name,
+    policy_arn="arn:aws:iam::aws:policy/AmazonPrometheusRemoteWriteAccess"
+)
+
 # Export the ECR repo URL
 #pulumi.export("ecr_repo_url", repo.repository_url)
+pulumi.export("flask_url", service.id)
+pulumi.export("amp_workspace_id", workspace.id)
