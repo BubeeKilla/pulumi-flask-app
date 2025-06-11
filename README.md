@@ -1,6 +1,7 @@
 # Pulumi Flask App Deployment 🚀
 
 This project demonstrates how to deploy a containerized Flask application on AWS Fargate using Pulumi and automate the deployment using GitHub Actions.
+What is optional means you have to comment out if you dont want to use those services(like AMP), otherwise leave as is.
 
 ## 🔧 Tech Stack
 
@@ -9,6 +10,7 @@ This project demonstrates how to deploy a containerized Flask application on AWS
 - **Pulumi** – Infrastructure as Code (IaC) to deploy AWS resources
 - **AWS Fargate** – Serverless compute for containers
 - **GitHub Actions** – CI/CD pipeline for automated deployment
+- **Prometheus and Grafana for monitoring(optional) - this you will have to download, install and configure your self on your machines.
 
 ## 📁 Project Structure
 
@@ -38,6 +40,7 @@ Pulumi provisions:
 - ECS cluster with Fargate service
 - CloudWatch log group
 - ECR repository and container image push
+- AMP (Amazon Managed Prometheus) workspace(optional)
 
 To deploy manually:
 
