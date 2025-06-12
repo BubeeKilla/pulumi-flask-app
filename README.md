@@ -10,7 +10,7 @@ What is optional means you have to comment out if you dont want to use those ser
 - **Pulumi** – Infrastructure as Code (IaC) to deploy AWS resources
 - **AWS Fargate** – Serverless compute for containers
 - **GitHub Actions** – CI/CD pipeline for automated deployment
-- **Prometheus and Grafana for monitoring(optional) - this you will have to download, install and configure your self on your machines.
+- **Prometheus and Grafana** for monitoring(optional) - this you will have to download, install and configure your self on your machines.
 
 ## 📁 Project Structure
 
